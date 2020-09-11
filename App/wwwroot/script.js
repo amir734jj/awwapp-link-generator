@@ -9,7 +9,7 @@ angular.module('myApp', ['angular-loading-bar'])
     $scope.getLinks = function (e) {
         e.preventDefault();
         
-        $http.get("/" + $scope.count).then(function (response) {
+        $http.get("/link/" + $scope.count).then(function (response) {
             $scope.links = response.data;
             $scope.text = $scope.links.map(function (link, index) {
                 return $scope.prefix + " " + (index + 1) + ":" + "\n" + link + "\n";

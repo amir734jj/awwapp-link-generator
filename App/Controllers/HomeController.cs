@@ -15,13 +15,15 @@ namespace App.Controllers
             _appLogic = appLogic;
         }
         
+        [HttpGet]
+        [Route("")]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpGet]
-        [Route("{count}")]
+        [Route("link/{count}")]
         public async Task<IActionResult> GenerateLinks([FromRoute] int count)
         {
             return Ok(await _appLogic.GenerateLinks(count).ToHashSetAsync());
