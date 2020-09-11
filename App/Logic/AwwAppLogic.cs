@@ -20,8 +20,15 @@ namespace App.Logic
 
             var random = new Random();
             var mutex = new SemaphoreSlim(1);
+
+            var path = Environment.GetEnvironmentVariable("GOOGLE_CHROME_SHIM");
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            }
             
-            using var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            using var driver = new ChromeDriver(path);
 
             while (count-- > 0)
             {
