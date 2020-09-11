@@ -1,7 +1,7 @@
 angular.module('myApp', ['angular-loading-bar'])
     .controller('linkGenCtrl', ["$scope", "$http", function($scope, $http) {
     
-    $scope.count = 0;
+    $scope.count = 1;
     $scope.prefix = "Group";
     $scope.links = [];
     $scope.text = "";
