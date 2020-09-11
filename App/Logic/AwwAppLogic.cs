@@ -21,7 +21,7 @@ namespace App.Logic
             var random = new Random();
             var mutex = new SemaphoreSlim(1);
 
-            var path = Environment.GetEnvironmentVariable("GOOGLE_CHROME_SHIM");
+            var path = Environment.GetEnvironmentVariable("WD_CHROME_PATH");
 
             if (string.IsNullOrWhiteSpace(path))
             {
