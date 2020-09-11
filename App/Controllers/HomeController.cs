@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using IAwwAppLogic = App.Logic.Interfaces.IAwwAppLogic;
 
