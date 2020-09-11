@@ -21,14 +21,12 @@ namespace App.Logic
             var random = new Random();
             var mutex = new SemaphoreSlim(1);
 
-            var path = Environment.GetEnvironmentVariable("GOOGLE_CHROME_SHIM");
-
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            }
+            var googleChromeShim = Environment.GetEnvironmentVariable("GOOGLE_CHROME_SHIM");
             
-            using var driver = new ChromeDriver(path);
+            using var driver = !string.IsNullOrWhiteSpace(googleChromeShim) ? new ChromeDriver(new ChromeOptions
+            {
+                BinaryLocation = googleChromeShim
+            }) : new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
             while (count-- > 0)
             {
