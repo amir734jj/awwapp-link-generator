@@ -22,7 +22,7 @@ namespace App.Logic
             var mutex = new SemaphoreSlim(1);
 
             var googleChromeShim = Environment.GetEnvironmentVariable("GOOGLE_CHROME_SHIM");
-            
+
             using var driver = !string.IsNullOrWhiteSpace(googleChromeShim) ? new ChromeDriver(new ChromeOptions
             {
                 BinaryLocation = googleChromeShim
