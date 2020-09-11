@@ -1,10 +1,14 @@
+using System;
 using App.Controllers;
+using App.Dal;
+using App.Interfaces;
 using App.Logic;
-using App.Logic.Interfaces;
+using Marten;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using static App.Utilities.ConnectionStringUtility;
 
 namespace App
 {
@@ -15,8 +19,12 @@ namespace App
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IAwwAppLogic, AwwAppLogic>();
+
+            services.AddScoped<IAwwAppLinkDal, AwwAppLinkDal>();
             
             services.AddScoped<HomeController>();
+            
+            services.AddMarten(ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL")));
 
             services.AddRouting();
 
@@ -24,8 +32,10 @@ namespace App
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAwwAppLogic logic)
         {
+            logic.GenerateLinks(100);
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

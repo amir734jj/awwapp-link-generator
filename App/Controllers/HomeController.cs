@@ -1,7 +1,6 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using IAwwAppLogic = App.Logic.Interfaces.IAwwAppLogic;
+using IAwwAppLogic = App.Interfaces.IAwwAppLogic;
 
 namespace App.Controllers
 {
@@ -26,7 +25,7 @@ namespace App.Controllers
         [Route("link/{count}")]
         public async Task<IActionResult> GenerateLinks([FromRoute] int count)
         {
-            return Ok(await _appLogic.GenerateLinks(count).ToHashSetAsync());
+            return Ok(await _appLogic.GenerateLinks(count));
         }
     }
 }
