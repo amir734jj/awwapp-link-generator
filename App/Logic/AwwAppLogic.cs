@@ -13,7 +13,7 @@ namespace App.Logic
     {
         public async IAsyncEnumerable<string> GenerateLinks(int count)
         {
-            if (count <= 0)
+            if (count <= 0 || count > 20)
             {
                 throw new ArgumentException("Argument out of range", nameof(count));
             }
