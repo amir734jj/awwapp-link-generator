@@ -37,6 +37,7 @@ namespace App.Logic
                 driver.Navigate().GoToUrl("https://awwapp.com/");
 
                 driver.FindElement(By.LinkText("Start drawing")).Click();
+                
                 driver.FindElement(By.Id("collaborate-button")).Click();
 
                 var link = driver.FindElement(By.ClassName("js-board-link")).GetAttribute("value");

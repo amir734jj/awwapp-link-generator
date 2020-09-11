@@ -1,4 +1,5 @@
-angular.module('myApp', []).controller('linkGenCtrl', ["$scope", "$http", function($scope, $http) {
+angular.module('myApp', ['angular-loading-bar'])
+    .controller('linkGenCtrl', ["$scope", "$http", function($scope, $http) {
     
     $scope.count = 0;
     $scope.prefix = "Group";
