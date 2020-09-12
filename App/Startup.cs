@@ -51,7 +51,7 @@ namespace App
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAwwAppLogic logic, IAwwAppLinkDal dal, IBackgroundJobClient backgroundJobs)
         {
-            dal.Clean().Wait();
+            dal.Clean();
 
             backgroundJobs.Schedule(() => logic.CacheLinks(10), TimeSpan.FromMinutes(5));
 
