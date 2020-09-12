@@ -5,6 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.7.12" />
+        <PackageReference Include="Hangfire.Core" Version="1.7.12" />
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.7.1" />
         <PackageReference Include="Marten" Version="3.13.1" />
         <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
         <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="85.0.4183.8700" />

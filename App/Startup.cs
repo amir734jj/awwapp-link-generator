@@ -3,10 +3,11 @@ using App.Controllers;
 using App.Dal;
 using App.Interfaces;
 using App.Logic;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Marten;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using static App.Utilities.ConnectionStringUtility;
@@ -19,6 +20,9 @@ namespace App
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var pqConnectionString =
+                ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL"));
+            
             services.AddScoped<IAwwAppLogic, AwwAppLogic>();
 
             services.AddScoped<IAwwAppLinkDal, AwwAppLinkDal>();
@@ -27,10 +31,19 @@ namespace App
             
             services.AddMarten(x =>
             {
-                x.Connection(ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL")));
+                x.Connection(pqConnectionString);
                 x.PLV8Enabled = false;
                 x.AutoCreateSchemaObjects = AutoCreate.All;
             });
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(pqConnectionString));
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
 
             services.AddRouting();
 
@@ -38,16 +51,18 @@ namespace App
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAwwAppLogic logic, IAwwAppLinkDal dal)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAwwAppLogic logic, IAwwAppLinkDal dal, IBackgroundJobClient backgroundJobs)
         {
             dal.Clean().Wait();
 
-            logic.GenerateLinks(10, cacheMode: true).Wait();
-            
+            BackgroundJob.Schedule(() => logic.CacheLinks(10), TimeSpan.FromHours(1));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseHangfireServer();
 
             app.UseStaticFiles();
 
@@ -56,6 +71,7 @@ namespace App
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
             });
         }
     }

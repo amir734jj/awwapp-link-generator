@@ -5,6 +5,8 @@ namespace App.Interfaces
 {
     public interface IAwwAppLogic
     {
-        Task<List<string>> GenerateLinks(int count, bool cacheMode = false);
+        Task<List<string>> GenerateLinks(int count);
+
+        Task CacheLinks(int count);
     }
 }

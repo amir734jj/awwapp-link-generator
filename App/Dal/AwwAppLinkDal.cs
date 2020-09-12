@@ -16,7 +16,20 @@ namespace App.Dal
         {
             _documentStore = documentStore;
         }
-        
+
+        public async Task MarkUsed(string link)
+        {
+            using var session = _documentStore.LightweightSession();
+
+            var model = await session.Query<AwwAppLink>().FirstAsync(x => x.Link == link);
+
+            model.Used = true;
+            
+            session.Update(model);
+
+            await session.SaveChangesAsync();
+        }
+
         public async Task Insert(string link)
         {
             using var session = _documentStore.LightweightSession();

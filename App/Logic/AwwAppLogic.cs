@@ -21,8 +21,8 @@ namespace App.Logic
         {
             _awwAppLinkDal = awwAppLinkDal;
         }
-        
-        public async Task<List<string>> GenerateLinks(int count, bool cacheMode = false)
+
+        private async Task<List<string>> GenerateLinks(int count, bool cacheMode)
         {
             if (count <= 0 || count > 20)
             {
@@ -38,6 +38,11 @@ namespace App.Logic
                 driver.Manage().Cookies.DeleteAllCookies();
 
                 var link = await ResolveUniqueUrl(driver);
+
+                if (!cacheMode)
+                {
+                    await _awwAppLinkDal.MarkUsed(link);
+                }
 
                 driver.Close();
 
@@ -77,6 +82,16 @@ namespace App.Logic
             await _awwAppLinkDal.Insert(link);
 
             return link;
+        }
+
+        public async Task<List<string>> GenerateLinks(int count)
+        {
+            return await GenerateLinks(count, false);
+        }
+
+        public async Task CacheLinks(int count)
+        {
+            await GenerateLinks(count, true);
         }
     }
 }
