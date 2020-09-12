@@ -30,7 +30,7 @@ namespace App.Utilities
                 TrustServerCertificate = true,
                 Pooling = true,
                 // Hard limit
-                MaxPoolSize = 2
+                MaxPoolSize = 1
             };
 
             return connectionStringBuilder.ToString();

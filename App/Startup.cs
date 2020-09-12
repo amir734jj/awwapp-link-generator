@@ -4,7 +4,7 @@ using App.Dal;
 using App.Interfaces;
 using App.Logic;
 using Hangfire;
-using Hangfire.PostgreSql;
+using Hangfire.MemoryStorage;
 using Marten;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,9 +20,6 @@ namespace App
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var pqConnectionString =
-                ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL"));
-            
             services.AddScoped<IAwwAppLogic, AwwAppLogic>();
 
             services.AddScoped<IAwwAppLinkDal, AwwAppLinkDal>();
@@ -31,7 +28,7 @@ namespace App
             
             services.AddMarten(x =>
             {
-                x.Connection(pqConnectionString);
+                x.Connection(ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL")));
                 x.PLV8Enabled = false;
                 x.AutoCreateSchemaObjects = AutoCreate.All;
             });
@@ -40,7 +37,7 @@ namespace App
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(pqConnectionString));
+                .UseMemoryStorage());
 
             // Add the processing server as IHostedService
             services.AddHangfireServer();
@@ -55,7 +52,7 @@ namespace App
         {
             dal.Clean().Wait();
 
-            BackgroundJob.Schedule(() => logic.CacheLinks(10), TimeSpan.FromHours(1));
+            backgroundJobs.Schedule(() => logic.CacheLinks(10), TimeSpan.FromMinutes(5));
 
             if (env.IsDevelopment())
             {
