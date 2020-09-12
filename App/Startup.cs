@@ -1,6 +1,7 @@
 using System;
 using App.Controllers;
 using App.Dal;
+using App.Filters;
 using App.Interfaces;
 using App.Logic;
 using Hangfire;
@@ -61,7 +62,14 @@ namespace App
 
             app.UseHangfireServer();
 
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {               
+                DashboardTitle = "Hangfire Jobs",
+                Authorization = new[]
+                {
+                    new  HangfireAuthorizationFilter("admin")
+                }
+            });
 
             app.UseStaticFiles();
 
