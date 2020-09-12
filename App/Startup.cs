@@ -64,6 +64,8 @@ namespace App
 
             app.UseHangfireServer();
 
+            app.UseHangfireDashboard();
+
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -71,7 +73,6 @@ namespace App
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHangfireDashboard();
             });
         }
     }
