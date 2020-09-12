@@ -46,7 +46,7 @@ namespace App.Dal
         {
             using var session = _documentStore.LightweightSession();
 
-            foreach (var model in (await session.Query<AwwAppLink>().ToListAsync()).Where(x => DateTimeOffset.Now.Subtract(x.CreatedOn) < TimeSpan.FromDays(7)))
+            foreach (var model in (await session.Query<AwwAppLink>().ToListAsync()).Where(x => DateTimeOffset.Now.Subtract(x.CreatedOn) >= TimeSpan.FromDays(7)))
             {
                 session.Delete(model);
             }
