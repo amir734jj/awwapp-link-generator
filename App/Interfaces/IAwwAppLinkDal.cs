@@ -8,5 +8,7 @@ namespace App.Interfaces
         public Task Insert(string link);
 
         public Task<List<string>> Collect(int count);
+
+        Task Clean();
     }
 }

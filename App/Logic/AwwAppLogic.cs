@@ -31,12 +31,8 @@ namespace App.Logic
 
             var links = cacheMode ? new List<string>() : await _awwAppLinkDal.Collect(count);
 
-            var mutex = new SemaphoreSlim(1);
-            
-            var tasks = Enumerable.Range(0, count - links.Count).Select(async _ =>
+            foreach (var _ in Enumerable.Range(0, count - links.Count))
             {
-                await mutex.WaitAsync();
-
                 using var driver = GetWebDriver();
 
                 driver.Manage().Cookies.DeleteAllCookies();
@@ -45,28 +41,27 @@ namespace App.Logic
 
                 driver.Close();
 
-                Thread.Sleep(Random.Next(50, 1000));
+                Thread.Sleep(Random.Next(50, 2000));
 
-                mutex.Release();
-
-                return link;
-            }).ToList();
-
-            await Task.WhenAll(tasks);
-
-            return tasks.Select(x => x.Result).ToHashSet().ToList();
+                links.Add(link);
+            }
+            
+            return links.ToHashSet().ToList();
         }
 
         private static IWebDriver GetWebDriver()
         {
             var googleChromeShim = Environment.GetEnvironmentVariable("GOOGLE_CHROME_SHIM");
 
-            return !string.IsNullOrWhiteSpace(googleChromeShim)
-                ? new ChromeDriver(new ChromeOptions
+            if (!string.IsNullOrWhiteSpace(googleChromeShim))
+            {
+                return new ChromeDriver(new ChromeOptions
                 {
                     BinaryLocation = googleChromeShim
-                })
-                : new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+                });
+            }
+
+            return new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
 
         private async Task<string> ResolveUniqueUrl(IWebDriver driver)

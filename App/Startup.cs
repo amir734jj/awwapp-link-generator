@@ -6,6 +6,7 @@ using App.Logic;
 using Marten;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using static App.Utilities.ConnectionStringUtility;
@@ -24,7 +25,12 @@ namespace App
             
             services.AddScoped<HomeController>();
             
-            services.AddMarten(ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL")));
+            services.AddMarten(x =>
+            {
+                x.Connection(ConnectionStringUrlToPgResource(Environment.GetEnvironmentVariable("DATABASE_URL")));
+                x.PLV8Enabled = false;
+                x.AutoCreateSchemaObjects = AutoCreate.All;
+            });
 
             services.AddRouting();
 
@@ -32,9 +38,11 @@ namespace App
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAwwAppLogic logic)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAwwAppLogic logic, IAwwAppLinkDal dal)
         {
-            logic.GenerateLinks(100);
+            dal.Clean().Wait();
+
+            logic.GenerateLinks(10, cacheMode: true).Wait();
             
             if (env.IsDevelopment())
             {

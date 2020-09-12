@@ -1,13 +1,18 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Marten.Schema;
 
 namespace App.Models
 {
     public class AwwAppLink
     {
         [Key]
-        public string Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Identity]
+        public Guid Id { get; set; }
         
+        [UniqueIndex(IndexType = UniqueIndexType.Computed)]
         public string Link { get; set; }
         
         public bool Used { get; set; }
