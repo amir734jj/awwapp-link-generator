@@ -53,7 +53,7 @@ namespace App
         {
             dal.Clean();
 
-            backgroundJobs.Schedule(() => logic.CacheLinks(10), TimeSpan.FromMinutes(1));
+            backgroundJobs.Schedule(() => logic.CacheLinks(10), TimeSpan.FromSeconds(30));
 
             if (env.IsDevelopment())
             {
