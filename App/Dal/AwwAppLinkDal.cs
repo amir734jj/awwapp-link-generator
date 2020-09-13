@@ -11,6 +11,8 @@ namespace App.Dal
     public class AwwAppLinkDal : IAwwAppLinkDal
     {
         private readonly IDocumentStore _documentStore;
+        
+        private readonly TimeSpan _invalidateTimeSpan = TimeSpan.FromMinutes(15);
 
         public AwwAppLinkDal(IDocumentStore documentStore)
         {
@@ -46,7 +48,7 @@ namespace App.Dal
         {
             using var session = _documentStore.LightweightSession();
 
-            foreach (var model in (await session.Query<AwwAppLink>().ToListAsync()).Where(x => DateTimeOffset.Now.Subtract(x.CreatedOn) >= TimeSpan.FromDays(7)))
+            foreach (var model in (await session.Query<AwwAppLink>().ToListAsync()).Where(x => DateTimeOffset.Now.Subtract(x.CreatedOn) >= _invalidateTimeSpan))
             {
                 session.Delete(model);
             }
@@ -61,7 +63,7 @@ namespace App.Dal
             var models = (await session.Query<AwwAppLink>()
                 .Where(x => x.Used == false)
                 .Take(count)
-                .ToListAsync()).Where(x => DateTimeOffset.Now.Subtract(x.CreatedOn) < TimeSpan.FromDays(7)).ToList();
+                .ToListAsync()).Where(x => DateTimeOffset.Now.Subtract(x.CreatedOn) < _invalidateTimeSpan).ToList();
 
             foreach (var model in models)
             {
